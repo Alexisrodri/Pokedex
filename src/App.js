@@ -4,7 +4,7 @@ import { Header } from './Componentes/Header';
 import Pokedex from './Componentes/Pokedex';
 import  Busqueda  from './Componentes/Searchs';
 import { FavoriteProvider } from './Context/PokemonesFavoritos';
-import { resultPokemons, dataPokemons} from './Fetch';
+import { resultPokemons, dataPokemons, pokemonsAPI} from './Fetch';
 
 function App() {
   const [pokemons, setPokemons] = useState([]);
@@ -12,6 +12,7 @@ function App() {
   const [total, setTotal] = useState(0)
   const [page, setPage] = useState(0)
   const [favoritos, setFavoritos] = useState([])
+  const [noEncontrado, setNoEncontrado] = useState()
 
   const fecthPokemons = async() => {
     try{
@@ -42,16 +43,32 @@ const updateFavoritePokemons = (name) => {
   setFavoritos(actualizarFav)
 }
 
+const Buscador = async(pokemon) => {
+  setCargando(true)
+  const resultados = await pokemonsAPI(pokemon)
+  if(!resultados){
+    setNoEncontrado(true)
+  }else{
+    setPokemons([resultados])
+  }
+  setCargando(false)
+}
+
   return (
   <FavoriteProvider value={{
     favoritePokemon:favoritos,
     updateFavoritePokemon:updateFavoritePokemons
   }}>
   <Header />
-  <Busqueda pokemons={pokemons}/>
-  <Pokedex cargando={cargando} pokemons={pokemons} page={page} setPage={setPage} total={total}/>
+  <Busqueda pokemons={pokemons} Buscador={Buscador} />
+  {noEncontrado ?
+  <h1>Pokemon no encontrado😢</h1>
+:
+<Pokedex cargando={cargando} pokemons={pokemons} page={page} setPage={setPage} total={total}/>
+}
 </FavoriteProvider>
     );
 }
+
 
 export default App;
