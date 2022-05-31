@@ -1,9 +1,8 @@
 import React,{useState} from "react"
-import { pokemonsAPI } from "../Fetch";
 
 const Busqueda = (props) => {
+    const {Buscador} = props
     const [buscar,setBuscar] = useState('');
-    const [pokemon, setPokemon] = useState();
 
     const Enter = (e) => {
         if(e.key === "Enter"){
@@ -11,20 +10,19 @@ const Busqueda = (props) => {
         }
     }
 
-    const Buscador = (e) => {
+    const buscador = (e) => {
             setBuscar(e.target.value)
     }
     
     const BuscadorClick = async(e) => {
-        const data = await pokemonsAPI(buscar)
-        setPokemon(data)    
-}
+        Buscador(buscar)    
+    }
 
 
     return( 
         <section>
         <div className="cont-buscador">
-        <input className="Buscador" placeholder="Busca un pokemon..." onChange={Buscador} onKeyDown={Enter}></input>
+        <input className="Buscador" placeholder="Busca un pokemon..." onChange={buscador} onKeyDown={Enter}></input>
         <button className="buscador-btn" onClick={BuscadorClick}>🔍</button>
         </div>
         </section>
