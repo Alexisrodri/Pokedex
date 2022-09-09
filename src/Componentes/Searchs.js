@@ -12,11 +12,13 @@ const Busqueda = (props) => {
 
     const buscador = (e) => {
             setBuscar(e.target.value)
+            if(e.target.value.length === 0) {
+                Buscador(null)
+            }
     }
     
     const BuscadorClick = async(e) => {
         Buscador(buscar)
-        console.log('enter');    
     }
 
 

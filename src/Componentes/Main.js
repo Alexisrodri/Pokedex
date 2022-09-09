@@ -13,7 +13,11 @@ function Main() {
   const [page, setPage] = useState(0)
   const [favoritos, setFavoritos] = useState([])
   const [noEncontrado, setNoEncontrado] = useState()
+  const [buscando, setBuscando] = useState(false)
 
+
+  const localStorageKey = "favorites_pokemon"
+  
   const fecthPokemons = async() => {
     try{
     setCargando(true);
@@ -25,40 +29,64 @@ function Main() {
     setPokemons(resultados)
     setCargando(false)
     setTotal(Math.floor(data.count / 24))
+    setNoEncontrado(false)
   }catch(error){} 
   }
 
+  const loadFavoritesPokemons = () => {
+    const pokemons = JSON.parse(window.localStorage.getItem(localStorageKey))|| [];
+    setFavoritos(pokemons)
+
+  }
+
   useEffect(()=>{
-    fecthPokemons()
+    loadFavoritesPokemons();
+  },[])
+
+
+  useEffect(()=>{
+    if(!buscando){
+      fecthPokemons()
+    }
   },[page])
 
 const updateFavoritePokemons = (name) => {
   const actualizarFav = [...favoritos]
-  const Addfavorito = favoritos.indexOf(name)
-  if(Addfavorito > 0 ){
+  const Addfavorito = actualizarFav.indexOf(name)
+  if(Addfavorito >= 0 ){
     actualizarFav.splice(Addfavorito, 1)
   }else{
     actualizarFav.push(name)
   }
   setFavoritos(actualizarFav)
+  window.localStorage.setItem(localStorageKey,
+    JSON.stringify(actualizarFav))
 }
 
 const Buscador = async (pokemon) => {
+  if(!pokemon){
+    return fecthPokemons()
+  }
   setCargando(true)
+  setCargando(false)
+  setBuscando(true)
   const lowerCase = pokemon.toLowerCase()
   const resultados = await pokemonsAPI(lowerCase)
   if(!resultados){
     setNoEncontrado(true)
+    setCargando(false)
+    return;
   }
   else{
     setPokemons([resultados])
   }
   setCargando(false)
+  setBuscando(false)
 }
 
 
 
-  return (
+  return ( 
   <FavoriteProvider value={{
     favoritePokemon:favoritos,
     updateFavoritePokemon:updateFavoritePokemons
